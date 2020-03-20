@@ -16,8 +16,10 @@ FROM multiarch/alpine:${ARCH}-edge
 
 LABEL maintainer="Jan Collijs"
 
-ENV DNS1 1.1.1.1
-ENV DNS2 1.0.0.1
+ENV \
+  DNS1=1.1.1.1 \
+  DNS2=1.0.0.1 \
+  METRICS="localhost:"
 
 RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/main' > /etc/apk/repositories ; \
     echo 'http://dl-cdn.alpinelinux.org/alpine/edge/community' >> /etc/apk/repositories; \
@@ -30,4 +32,4 @@ HEALTHCHECK --interval=5s --timeout=3s --start-period=5s CMD nslookup -po=5054 c
 
 USER cloudflared
 
-CMD ["/bin/sh", "-c", "/usr/local/bin/cloudflared proxy-dns --address 0.0.0.0 --port 5054 --upstream https://${DNS1}/.well-known/dns-query --upstream https://${DNS2}/.well-known/dns-query"]
+CMD ["/bin/sh", "-c", "/usr/local/bin/cloudflared proxy-dns --address 0.0.0.0 --port 5054 --metrics ${METRICS} --upstream https://${DNS1}/.well-known/dns-query --upstream https://${DNS2}/.well-known/dns-query"]
